@@ -2,8 +2,9 @@ from Tkinter import *
 import serial
 import sysconfig
 import time
+import datetime
 import serial.tools.list_ports
-
+from ScrolledText import ScrolledText
 
 
 class App(Frame):
@@ -11,6 +12,7 @@ class App(Frame):
 			Frame.__init__(self, master)
 			self.grid()
 			self.master.title("Kuehlaggregat")
+			self.stat = False
 			
 			#Frame Kopfzeilen
 			FrameKopf = Frame(master)
@@ -68,7 +70,7 @@ class App(Frame):
 			
 			#Widgets Konsole
 			self.labelKonsole = Label(FrameUnten, relief = SUNKEN, width = 12, text = "Konsole:")
-			self.textKonsole = Text(FrameUnten, height = 3, width = 80)	
+			self.textKonsole = ScrolledText(FrameUnten, height = 3, width = 80)	
 			
 			#Setzen der einzelen Widgets
 			self.labelSer.grid(row = 0, column = 0, columnspan = 2, pady = 5, padx = 20)
@@ -96,16 +98,56 @@ class App(Frame):
 			self.textPelAu.grid(row = 4, column = 1)
 			self.labelPlot.grid(row = 0, column = 0, sticky = E)
 			self.labelKonsole.grid(row = 0, column = 0, sticky = W)
-			self.textKonsole.grid(row = 0, column = 1, padx = 13)
+			self.textKonsole.grid(row = 0, column = 1, padx = 13, sticky = S)
 		
+	# Function: Starting Connection to Arduino and start Datalogging
 	def startdata(self):
 		self.textKonsole.delete('1.0', END)
 		self.textKonsole.insert(END, "Starting...\n")
+		self.textKonsole.insert(END, "Scanning for Ports: \n")
+		self.arduinoPort = self.findArduinoPort()
+		if not self.arduinoPort:
+			self.textKonsole.insert(END,"No Arduino found\n")
+		else:	
+			self.textKonsole.insert(END,"Arduino found: ")
+			self.textKonsole.insert(END, self.arduinoPort)
+			self.textKonsole.insert(END, "\nTry connecting to arduino...\n")
+			self.serialArduino = serial.Serial(str(self.arduinoPort), 9600, timeout = 2)
+			self.stat = (str(self.serialArduino.isOpen()))
+			if not self.stat:
+				self.textKonsole.insert(END, "Connection failed!")
+			else:
+				self.textKonsole.insert(END, "Connection establish!\n")
+				self.textKonsole.insert(END, "Starting Datalogging..\n")
+				self.datalog()
+				return self.stat
+	
+	def datalog(self):
+		self.datei = open('data.log','w+',0)
+
+				
+				
+	
+	def findArduinoPort(self):
 		self.ports = list(serial.tools.list_ports.comports())
-		self.textKonsole.insert(END, self.ports)
+		for port in self.ports:
+			if "VID:PID=0403:6001" in port[0]\
+				or "VID:PID=0403:6001" in port[1]\
+				or "VID:PID=0403:6001" in port[2]:
+				return port[0] 		
+			
 	def stopdata(self):
 		self.textKonsole.delete('1.0', END)
 		self.textKonsole.insert(END, "Stopping...\n")
+		if not self.stat:
+			self.textKonsole.insert(END, "Nothing to do\n")
+		else:
+			self.textKonsole.insert(END,"Closing Serial...\n")
+			self.serialArduino.close()
+			self.stat = False
+			self.textKonsole.insert(END,"Close Serial!\n")
+			
+					
 	def cool(self):
 		print ("Kuehlen")
 	def hot(self):
