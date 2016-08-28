@@ -1,4 +1,8 @@
 from Tkinter import *
+import serial
+import sysconfig
+import time
+import serial.tools.list_ports
 
 
 
@@ -64,7 +68,7 @@ class App(Frame):
 			
 			#Widgets Konsole
 			self.labelKonsole = Label(FrameUnten, relief = SUNKEN, width = 12, text = "Konsole:")
-			self.textKonsole = Text(FrameUnten, height = 1, width = 80)	
+			self.textKonsole = Text(FrameUnten, height = 3, width = 80)	
 			
 			#Setzen der einzelen Widgets
 			self.labelSer.grid(row = 0, column = 0, columnspan = 2, pady = 5, padx = 20)
@@ -95,10 +99,13 @@ class App(Frame):
 			self.textKonsole.grid(row = 0, column = 1, padx = 13)
 		
 	def startdata(self):
-		print ("Start")
-		self.textKonsole.insert(END, "Start")
+		self.textKonsole.delete('1.0', END)
+		self.textKonsole.insert(END, "Starting...\n")
+		self.ports = list(serial.tools.list_ports.comports())
+		self.textKonsole.insert(END, self.ports)
 	def stopdata(self):
-		print ("Stop")
+		self.textKonsole.delete('1.0', END)
+		self.textKonsole.insert(END, "Stopping...\n")
 	def cool(self):
 		print ("Kuehlen")
 	def hot(self):
