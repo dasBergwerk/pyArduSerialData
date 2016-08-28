@@ -1,39 +1,54 @@
 from Tkinter import *
 
+
+
 class App(Frame):
 	def __init__(self, master = None):
 			Frame.__init__(self, master)
 			self.grid()
 			self.master.title("Kuehlaggregat")
-
-			FrameKopf = Frame(master, bg = "red")
+			
+			#Frame Kopfzeilen
+			FrameKopf = Frame(master)
 			FrameKopf.grid(row = 0, column = 0, rowspan = 2, columnspan = 10, pady = 2)
-        
-			FrameLinks = Frame(master, bg = "blue")
-			FrameLinks.grid(row = 2, column = 0, rowspan = 5, columnspan = 2, pady = 2)
-        
-			FrameRechts = Frame(master, bg = "green")
+        	
+        	#Frame Links
+			FrameLinks = Frame(master)
+			FrameLinks.grid(row = 2, column = 0, rowspan = 5, columnspan = 2, pady = 10)
+        	
+        	#Frame Rechts
+			FrameRechts = Frame(master)
 			FrameRechts.grid(row = 2, column = 2, rowspan = 5, columnspan = 8, pady = 2, sticky = W+N)
-        
-			FrameUnten = Frame(master, bg = "yellow")
-			FrameUnten.grid(row = 8, column = 0, columnspan = 10, pady = 2, sticky = W)
+        	
+        	#Frame Unten
+			FrameUnten = Frame(master)
+			FrameUnten.grid(row = 8, column = 0, columnspan = 10, pady = 10, sticky = W, padx = 13)
         
 
-		
+				
+			# Widgets Serielle Schnittstelle			
 			self.labelSer = Label(FrameKopf, text = "Serielle Schnittstelle")
 			self.buttonStart = Button(FrameKopf, text = "Start", fg = "green", height = 2, width = 6, command = self.startdata)
 			self.buttonStop = Button(FrameKopf, text = "Stop", fg = "red", height = 2, width = 6, command = self.stopdata)
+			
+			#Widgets Steuerung Aggregat
 			self.labelAgg = Label(FrameKopf, text = "Steuerung Aggregat")
 			self.buttonKuehlen = Button(FrameKopf, text = "Kuehlen", height = 2, width = 6, command = self.cool)
 			self.buttonHeizen = Button(FrameKopf, text = "Heizen", height = 2, width = 6,command = self.hot)
 			self.buttonAus = Button(FrameKopf, text = "Aus", height = 2, width = 6, command = self.aus)
+			
+			#Widgets Steuerung Temperatur
 			self.labelSTTemp = Label(FrameKopf, text = "Steuerung Temperatur")
 			self.scaleTemp = Scale(FrameKopf, from_=10, to=42, orient = HORIZONTAL)
 			self.buttonTemp = Button(FrameKopf, text = "Senden", height = 2, width = 6, command = self.senden)
+			
+			#Widgets Programm
 			self.labelProg = Label(FrameKopf, text = "Programm")
-			self.labelStat = Label(FrameKopf, relief = SUNKEN, text = "Status")
+			self.labelStat = Label(FrameKopf, relief = SUNKEN, text = "Status:")
 			self.textStat = Text(FrameKopf, height = 1, width = 10)
 			self.buttonBeenden = Button(FrameKopf, text = "Beenden", fg = "red", height = 2, width = 6, command = master.quit)
+			
+			#Widgets Aktuelle Temperatur
 			self.labelAktuelleTemp = Label(FrameLinks, text = "Aktuelle Temperatur")
 			self.labelRaum = Label(FrameLinks, relief = SUNKEN, height = 1, width = 12, text = "Raum:")
 			self.textRaum = Text(FrameLinks, height = 1, width = 4)
@@ -43,24 +58,29 @@ class App(Frame):
 			self.textPelIn = Text(FrameLinks, height = 1, width = 4)
 			self.labelPelAu = Label(FrameLinks, relief = SUNKEN, height = 1, width = 12, text = "Pelitier Aussen:")
 			self.textPelAu = Text(FrameLinks, height = 1, width = 4)
+			
+			#Widgets Plotting
 			self.labelPlot = Label(FrameRechts, text = "Plot")
-			self.labelKonsole = Label(FrameUnten, text = "Konsole")
-			self.textKonsole = Text(FrameUnten, height = 1, width = 20)
-	
+			
+			#Widgets Konsole
+			self.labelKonsole = Label(FrameUnten, relief = SUNKEN, width = 12, text = "Konsole:")
+			self.textKonsole = Text(FrameUnten, height = 1, width = 80)	
+			
+			#Setzen der einzelen Widgets
 			self.labelSer.grid(row = 0, column = 0, columnspan = 2, pady = 5, padx = 20)
-			self.labelAgg.grid(row = 0, column = 2, columnspan = 3)
-			self.labelSTTemp.grid(row = 0, column = 5, columnspan = 2)
-			self.labelProg.grid(row = 0, column = 6, columnspan = 3)
+			self.labelAgg.grid(row = 0, column = 2, columnspan = 3, padx = 25)
+			self.labelSTTemp.grid(row = 0, column = 5, columnspan = 2, padx = 30)
+			self.labelProg.grid(row = 0, column = 7, columnspan = 3, padx = 20)
 			self.buttonStart.grid(row = 1, column = 0, sticky = E)
 			self.buttonStop.grid(row = 1, column = 1, sticky = W)
-			self.buttonKuehlen.grid(row = 1, column = 2)
+			self.buttonKuehlen.grid(row = 1, column = 2, sticky = E)
 			self.buttonHeizen.grid(row = 1, column = 3)
-			self.buttonAus.grid(row = 1, column = 4)
-			self.scaleTemp.grid(row = 1, column = 5)
-			self.buttonTemp.grid(row = 1, column = 6)
-			self.labelStat.grid(row = 1, column = 7)
-			self.textStat.grid(row = 1, column = 8)
-			self.buttonBeenden.grid(row = 1, column = 9)
+			self.buttonAus.grid(row = 1, column = 4, sticky = W)
+			self.scaleTemp.grid(row = 1, column = 5, sticky = E)
+			self.buttonTemp.grid(row = 1, column = 6, sticky = W)
+			self.labelStat.grid(row = 1, column = 7, sticky = E, padx = 5)
+			self.textStat.grid(row = 1, column = 8, sticky = W)
+			self.buttonBeenden.grid(row = 1, column = 9, padx = 5)
 			self.labelAktuelleTemp.grid(row = 0, column = 0, pady = 5)
 			self.labelRaum.grid(row = 1, column = 0)
 			self.labelTank.grid(row = 2, column = 0)
@@ -71,12 +91,12 @@ class App(Frame):
 			self.textPelIn.grid(row = 3, column = 1)
 			self.textPelAu.grid(row = 4, column = 1)
 			self.labelPlot.grid(row = 0, column = 0, sticky = E)
-			self.labelKonsole.grid(row = 0, column = 0)
-			self.textKonsole.grid(row = 0, column = 1)
+			self.labelKonsole.grid(row = 0, column = 0, sticky = W)
+			self.textKonsole.grid(row = 0, column = 1, padx = 13)
 		
-
 	def startdata(self):
 		print ("Start")
+		self.textKonsole.insert(END, "Start")
 	def stopdata(self):
 		print ("Stop")
 	def cool(self):
@@ -87,6 +107,7 @@ class App(Frame):
 		print ("Aggregat aus")
 	def senden(self):
 		print(self.scale.get())
+	
 
 root = Tk()
 app = App(master = root)
