@@ -6,6 +6,16 @@ import datetime
 import serial.tools.list_ports
 from ScrolledText import ScrolledText
 
+import matplotlib.pyplot as plt 
+
+from numpy import arange, sin, pi
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+# implement the default mpl key bindings
+from matplotlib.backend_bases import key_press_handler
+
+from matplotlib.figure import Figure
+
+
 
 class App(Frame):
 	def __init__(self, master = None):
@@ -29,9 +39,7 @@ class App(Frame):
         	#Frame Unten
 			FrameUnten = Frame(master)
 			FrameUnten.grid(row = 8, column = 0, columnspan = 10, pady = 10, sticky = W, padx = 13)
-        
-
-				
+        				
 			# Widgets Serielle Schnittstelle			
 			self.labelSer = Label(FrameKopf, text = "Serielle Schnittstelle")
 			self.buttonStart = Button(FrameKopf, text = "Start", fg = "green", height = 2, width = 6, command = self.startdata)
@@ -56,20 +64,25 @@ class App(Frame):
 			
 			#Widgets Aktuelle Temperatur
 			self.labelAktuelleTemp = Label(FrameLinks, text = "Aktuelle Temperatur")
-			self.labelRaum = Label(FrameLinks, relief = SUNKEN, height = 1, width = 12, text = "Raum:")
-			self.textRaum = Text(FrameLinks, height = 1, width = 4)
-			self.labelTank = Label(FrameLinks, relief = SUNKEN, height = 1, width = 12, text = "Tank:")
-			self.textTank = Text(FrameLinks, height = 1, width = 4)
-			self.labelPelIn = Label(FrameLinks, relief = SUNKEN, height = 1, width = 12, text = "Pelitier Innen:")
-			self.textPelIn = Text(FrameLinks, height = 1, width = 4)
-			self.labelPelAu = Label(FrameLinks, relief = SUNKEN, height = 1, width = 12, text = "Pelitier Aussen:")
-			self.textPelAu = Text(FrameLinks, height = 1, width = 4)
+			self.labelRaum = Label(FrameLinks, relief = SUNKEN, height = 2, width = 12, text = "Raum:")
+			self.textRaum = Text(FrameLinks, height = 2, width = 4)
+			self.labelTank = Label(FrameLinks, relief = SUNKEN, height = 2, width = 12, text = "Tank:")
+			self.textTank = Text(FrameLinks, height = 2, width = 4)
+			self.labelPelIn = Label(FrameLinks, relief = SUNKEN, height = 2, width = 12, text = "Pelitier Innen:")
+			self.textPelIn = Text(FrameLinks, height = 2, width = 4)
+			self.labelPelAu = Label(FrameLinks, relief = SUNKEN, height = 2, width = 12, text = "Pelitier Aussen:")
+			self.textPelAu = Text(FrameLinks, height = 2, width = 4)
 			
 			#Widgets Plotting
-			self.labelPlot = Label(FrameRechts, text = "Plot")
+			
+			self.dataplot()
+			self.canvas = FigureCanvasTkAgg(plt.f,FrameRechts)
+			self.canvas.show()
+			#self.toolbar = NavigationToolbar2TkAgg(self.canvas, FrameRechts)
+			#self.toolbar.update()
 			
 			#Widgets Konsole
-			self.labelKonsole = Label(FrameUnten, relief = SUNKEN, width = 12, text = "Konsole:")
+			self.labelKonsole = Label(FrameUnten, relief = SUNKEN, height = 2, width = 12, text = "Konsole:")
 			self.textKonsole = ScrolledText(FrameUnten, height = 3, width = 80)	
 			
 			#Setzen der einzelen Widgets
@@ -96,10 +109,12 @@ class App(Frame):
 			self.textTank.grid(row = 2, column = 1)
 			self.textPelIn.grid(row = 3, column = 1)
 			self.textPelAu.grid(row = 4, column = 1)
-			self.labelPlot.grid(row = 0, column = 0, sticky = E)
+			self.canvas.get_tk_widget().grid(row = 0, column = 0, pady = 10, padx = 10)
+			#self.canvas._tkcanvas.grid(row = 0, column = 0)
 			self.labelKonsole.grid(row = 0, column = 0, sticky = W)
 			self.textKonsole.grid(row = 0, column = 1, padx = 13, sticky = S)
-		
+			
+			
 	# Function: Starting Connection to Arduino and start Datalogging
 	def startdata(self):
 		self.textKonsole.delete('1.0', END)
@@ -125,8 +140,22 @@ class App(Frame):
 	def datalog(self):
 		self.datei = open('data.log','w+',0)
 
-				
-				
+	def dataplot(self):			
+		plt.f = Figure(figsize=(15,8), dpi=100)
+		plt.f.subplots_adjust(hspace = .5)
+		plt.a = plt.f.add_subplot(211)
+		plt.a.plot()	
+		plt.a.axis(ymin = 10, ymax = 40)
+		plt.a.set_title('Temperaturverlauf')
+		plt.a.set_ylabel('Temperatur')
+		plt.a.set_xlabel('Zeit')
+		plt.b = plt.f.add_subplot(212)
+		plt.b.plot()
+		plt.b.axis(ymin = -0.5, ymax = 1.5)
+		plt.b.set_title('Statusverlauf')
+		plt.b.set_ylabel('Status')
+		plt.b.set_xlabel('Zeit')
+		#plt.tight_layout(h_pad = 1)	
 	
 	def findArduinoPort(self):
 		self.ports = list(serial.tools.list_ports.comports())
